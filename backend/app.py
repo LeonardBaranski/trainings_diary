@@ -1,16 +1,17 @@
-from flask import Flask, redirect, url_for, session, request, jsonify
+from flask import Flask, redirect, url_for, session, jsonify, render_template, url_for
 from authlib.integrations.flask_client import OAuth
 import models
-import os
+from bson import json_util
+import json
 
 
 password = "mCSQ34bbZ6hB0tH7"
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../frontend/templates")
 app.secret_key = 'default_secret_key'
 app.config["MONGO_URI"] =  f"mongodb+srv://leonardbaranski:{password}@running-data.z2dj6fb.mongodb.net/?retryWrites=true&w=majority"
 
-models.init_app(app)
+db = models.Database(app)
 
 # Configure Google OAuth
 oauth = OAuth(app)
@@ -29,6 +30,11 @@ google = oauth.register(
     }
 )
 
+
+@app.route("/", methods=['GET'])
+def home():
+    return render_template("index.html")
+
 @app.route('/login/google')
 def login_google():
     redirect_uri = url_for('authorized', _external=True)
@@ -40,11 +46,10 @@ def authorized():
     userinfo = google.get('userinfo').json()
     # Now you have user info, you can create/login user in your database
 
-    # Check if user exists in the database, if not, create a new user
-    user = models.get_user_by_id(userinfo['id'])
+    user = db.get_user_by_id(userinfo['id'])
     if not user:
         user_data = {"google_id": userinfo['id'], "email": userinfo['email']}
-        models.add_user(user_data)
+        db.add_user(user_data)
 
     session['user_id'] = userinfo['id']
     return 'Logged in as id={}'.format(userinfo['id'])
@@ -60,8 +65,10 @@ def get_my_data():
     if not user_id:
         return jsonify({"error": "User not logged in"}), 403
 
-    training_data = models.get_running_data_by_user(user_id)
-    return jsonify(training_data)
+    training_data = db.get_running_data_by_user(user_id)
+    #training_data_cursor = db.get_running_data_by_user(user_id)
+    # training_data = [json.loads(json_util.dumps(doc)) for doc in training_data_cursor]
+    return render_template("mydata.html", training_data=training_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
