@@ -7,7 +7,7 @@ import json
 
 password = "mCSQ34bbZ6hB0tH7"
 
-app = Flask(__name__, template_folder="../frontend/templates")
+app = Flask(__name__, template_folder="../frontend/src", static_folder="../frontend/src")
 app.secret_key = 'default_secret_key'
 app.config["MONGO_URI"] =  f"mongodb+srv://leonardbaranski:{password}@running-data.z2dj6fb.mongodb.net/?retryWrites=true&w=majority"
 
