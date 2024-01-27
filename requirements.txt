@@ -2,3 +2,5 @@ pymongo
 flask
 flask-mongoengine
 flask-oauthlib
+flask-cors
+google-auth
