@@ -12,13 +12,11 @@ class Database(object):
 
     def init_app(self, app):
         self.db = MongoClient(app.config["MONGO_URI"], server_api=ServerApi('1'))
-        print(self.db)
         self.db = self.db.running_data
         self.users = self.db.users
-        print(self.db)
 
     def get_user_by_id(self, user_id):
-        return self.db.users.find_one({"google_id": user_id})
+        return self.db.users.find_one({"user_id": user_id})
 
     def add_user(self, user_data):
         return self.db.users.insert_one(user_data).inserted_id

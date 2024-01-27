@@ -1,5 +1,8 @@
-from flask import Flask, redirect, url_for, session, jsonify, render_template, url_for
+from flask import Flask, redirect, url_for, session, jsonify, render_template, url_for, request
+from flask_cors import CORS
 from authlib.integrations.flask_client import OAuth
+from google.oauth2 import id_token
+from google.auth.transport import requests
 import models
 from bson import json_util
 import json
@@ -7,18 +10,28 @@ import json
 
 password = "mCSQ34bbZ6hB0tH7"
 
-app = Flask(__name__, template_folder="../frontend/src", static_folder="../frontend/src")
-app.secret_key = 'default_secret_key'
+app = Flask(__name__, static_folder="../frontend/trainings_diary/build/static")
+CORS(app)
+app.secret_key = 'my_secret_key'
 app.config["MONGO_URI"] =  f"mongodb+srv://leonardbaranski:{password}@running-data.z2dj6fb.mongodb.net/?retryWrites=true&w=majority"
+app.config.update(
+    SESSION_COOKIE_SECURE=False,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='None',
+)
 
 db = models.Database(app)
+
+GOOGLE_CLIENT_ID = '42379345688-pct8948ievr9pl261l58ml0o8cga8cut.apps.googleusercontent.com'
+GOOGLE_CLIENT_SECRET = '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'
+REDIRECT_URI = 'http://localhost:5000/callback'
 
 # Configure Google OAuth
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
-    client_id='42379345688-mqd6d271fdaa2scqmjju6cosobe81ehg.apps.googleusercontent.com',
-    client_secret='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',
+    client_id=GOOGLE_CLIENT_ID,
+    client_secret=GOOGLE_CLIENT_SECRET,
     access_token_url='https://accounts.google.com/o/oauth2/token',
     access_token_params=None,
     authorize_url='https://accounts.google.com/o/oauth2/auth',
@@ -30,44 +43,50 @@ google = oauth.register(
     }
 )
 
-
+## !!!!! HIER WEITERMACHE. LOGOUT GEHT; FINDET ABER TEMPLATE ZUR STARTSEITE NICHT
 @app.route("/", methods=['GET'])
 def home():
     return render_template("index.html")
 
-@app.route('/login/google')
-def login_google():
-    redirect_uri = url_for('authorized', _external=True)
-    return google.authorize_redirect(redirect_uri)
+@app.route('/callback', methods=['POST'])
+def callback():
+    # Empfangen des Authentifizierungscodes von Google
+    id_token_jwt = request.json.get('token')
 
-@app.route('/login/google/authorized')
-def authorized():
-    token = google.authorize_access_token()
-    userinfo = google.get('userinfo').json()
-    # Now you have user info, you can create/login user in your database
+    try:
+        idinfo = id_token.verify_oauth2_token(id_token_jwt, requests.Request(), GOOGLE_CLIENT_ID, clock_skew_in_seconds=10)
+        print(idinfo)
+        userid = idinfo['sub']
 
-    user = db.get_user_by_id(userinfo['id'])
-    if not user:
-        user_data = {"google_id": userinfo['id'], "email": userinfo['email']}
-        db.add_user(user_data)
+        user = db.get_user_by_id(userid)
+        if not user:
+            user_data = {"user_id": userid, "email": idinfo.get("email")}
+            db.add_user(user_data)
+    
+        session['user'] = idinfo
+        print(session)
 
-    session['user_id'] = userinfo['id']
-    return 'Logged in as id={}'.format(userinfo['id'])
+        return f'Willkommen, {idinfo.get("name")}!'
 
-@app.route('/logout')
+    except ValueError as e:
+        print(e)
+        return 'Invalid token', 401
+
+@app.route('/logout', methods=['POST'])
 def logout():
-    session.pop('user_id', None)
-    return redirect(url_for('home'))
+    session.pop('user', None)
+    return render_template("index.html")
 
 @app.route('/mydata')
 def get_my_data():
-    user_id = session.get('user_id')
-    if not user_id:
+    print(session)
+    print(session.get('user'))
+    user_info = session.get('user')
+    if not user_info:
         return jsonify({"error": "User not logged in"}), 403
 
+    user_id = user_info['sub']
     training_data = db.get_running_data_by_user(user_id)
-    #training_data_cursor = db.get_running_data_by_user(user_id)
-    # training_data = [json.loads(json_util.dumps(doc)) for doc in training_data_cursor]
     return render_template("mydata.html", training_data=training_data)
 
 if __name__ == '__main__':
