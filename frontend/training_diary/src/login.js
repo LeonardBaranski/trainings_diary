@@ -23,7 +23,7 @@ const GoogleLogin = ({ onLoginSuccess }) => {
     console.log("Encoded JWT ID token: " + response.credential);
     // Hier können Sie Benutzerinformationen extrahieren und an onLoginSuccess weitergeben
     const user = { name: "Google User", email: "user@example.com" };
-    axios.post("http://localhost:5000/callback", { token: response.credential }).then((response) => {
+    axios.post("http://localhost:5000/callback", { token: response.credential }, { withCredentials: true }).then((response) => {
       console.log(response);
       onLoginSuccess(user);
     });
