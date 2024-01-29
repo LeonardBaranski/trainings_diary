@@ -41,7 +41,7 @@ def callback():
     
         session['user'] = idinfo
 
-        return f'Willkommen, {idinfo.get("name")}!'
+        return jsonify({"name": idinfo.get("name"), "email": idinfo.get("email")})
 
     except ValueError as e:
         print(e)
@@ -61,7 +61,6 @@ def get_my_data():
     user_id = user_info['sub']
     training_data_cursor = db.get_running_data_by_user(user_id)
 
-    # Convert the cursor to a list and then to a JSON serializable format
     training_data = list(training_data_cursor)
     training_data_json = json.loads(json_util.dumps(training_data))
 

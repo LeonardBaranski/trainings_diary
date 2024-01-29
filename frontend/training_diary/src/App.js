@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Tabs, Tab, Box } from '@mui/material';
+import { Container, Tabs, Tab, Box, Button, TextField, Card, CardContent, AppBar, Toolbar, Grid, Typography } from '@mui/material';
 import GoogleLogin from './login'; // Pfad zur GoogleLogin-Komponente
 import axios from 'axios';
-import { t } from 'prettier';
+import './App.css';
 
+
+const colorprimary = '#263E5A';
+const colorsecondary = '#D8C4B7';
+const colorbutton = '#5393C0';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -39,6 +43,7 @@ const App = () => {
   };
 
   const handleLoginSuccess = (user) => {
+    console.log(user)
     setIsLoggedIn(true);
     setUser(user);
   };
@@ -55,62 +60,73 @@ const App = () => {
     .catch(error => {
       console.error('There was an error logging out!', error);
     });
-    // Optional: Logout Logik für Google, falls notwendig
   };
 
-  if (!isLoggedIn) {
-    return (
-      <div className="App">
-        <h1>Willkommen zu meiner Anwendung</h1>
-        <GoogleLogin onLoginSuccess={handleLoginSuccess} />
-      </div>
-    );
-  }
+
   return (
     <div className="App">
-      <h1>Willkommen zu meiner Anwendung</h1>
-      {!isLoggedIn && <GoogleLogin onLoginSuccess={handleLoginSuccess} />}
-      {isLoggedIn && user && (
-        <div>
-          <div>Willkommen, {user.name}!</div>
-          <button onClick={handleLogout}>Ausloggen</button>
-          <Tabs value={tab} onChange={(event, newValue) => setTab(newValue)}>
-            <Tab label="Upload Data" />
-            <Tab label="View Data" />
-          </Tabs>
-          {tab === 0 && (
-            <Box>
-              <form onSubmit={handleSubmit}>
-                <input type="text" value={distance} onChange={(e) => setDistance(e.target.value)} placeholder="Strecke in km" />
-                <input type="text" value={speed} onChange={(e) => setPace(e.target.value)} placeholder="Pace (min/km)" />
-                <input type="text" value={heart_rate} onChange={(e) => setHeartRate(e.target.value)} placeholder="Herzfrequenz (bpm)" />
-                <button type="submit">Daten hochladen</button>
-              </form>
-            </Box>
-          )}
-          {tab === 1 && (
-            <Box>
-              {data && (
-                <div>
-                  <h2>Deine Lauftrainings:</h2>
-                  <ul>
-                    {data.map((item, index) => (
-                      <li key={index}>
-                        Strecke: {item.distance} km,
-                        Pace: {item.speed} min/km,
-                        Herzfrequenz: {item.heart_rate} bpm
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+      <Container maxWidth="sm" className="background">
+        {!isLoggedIn ? (
+          <Grid container alignItems="center" justify="center" style={{ minHeight: '100vh' }}>
+            <Grid item>
+              <Typography variant="h4">Willkommen zu meiner Anwendung</Typography>
+              <GoogleLogin onLoginSuccess={handleLoginSuccess} />
+            </Grid>
+          </Grid>
+        ) : (
+          <>
+            <AppBar position="static" className="customAppBar" style={{ background: '#2E3B55', borderRadius: "10px"}}>
+              <Toolbar>
+                <Typography variant="h6" style={{ flexGrow: 1 }}>
+                  Willkommen, {user.name}
+                </Typography>
+                <Button color="inherit" onClick={handleLogout} style={{ backgroundColor: '#5393C0', color: '#FFF' }}>
+                  Ausloggen
+                </Button>
+              </Toolbar>
+            </AppBar>
+            <Box style={{ marginTop: '20px'}}>
+              <Tabs value={tab} onChange={(event, newValue) => setTab(newValue)} className="tabsContainer" style={{ background: colorsecondary}}>
+                <Tab label="Training Hochladen" />
+                <Tab label="Meine Trainings" />
+              </Tabs>
+              {tab === 0 && (
+                <Box component="form" onSubmit={handleSubmit}>
+                  <div className='verticalForm'>
+                    <TextField label="Strecke in km" value={distance} onChange={(e) => setDistance(e.target.value)} style={{ marginBottom: '10px' }} />
+                    <TextField label="Pace (min/km)" value={speed} onChange={(e) => setPace(e.target.value)} style={{ marginBottom: '10px' }} />
+                    <TextField label="Herzfrequenz (bpm)" value={heart_rate} onChange={(e) => setHeartRate(e.target.value)} style={{ marginBottom: '10px' }} />
+                    <Button type="submit" variant="contained" style={{ backgroundColor: '#5393C0', color: '#FFF', marginBottom: "10px"}}>Daten hochladen</Button>
+                  </div>
+                </Box>
+              )}
+              {tab === 1 && (
+                <Box>
+                  {data && (
+                    <Card>
+                      <CardContent className='trainings'>
+                        <h2>Deine Lauftrainings:</h2>
+                        <ul>
+                          {data.map((item, index) => (
+                            <li key={index}>
+                              Strecke: {item.distance} km, 
+                              Pace: {item.speed} min/km, 
+                              Herzfrequenz: {item.heart_rate} bpm
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  )}
+                </Box>
               )}
             </Box>
-          )}
-        </div>
-      )}
+          </>
+        )}
+      </Container>
     </div>
   );
-}
+};
 
 export default App;
 

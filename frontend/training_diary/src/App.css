@@ -1,38 +1,60 @@
 .App {
   text-align: center;
+  padding: 20px;
+  background-image: url('../public/background.jpg');
+  background-size: cover; /* passt das Bild an die Größe des Containers an */
+  background-repeat: no-repeat; 
+  width: 100%;
+  height: 100vh;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.Container {
+  margin-top: 50px;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  transition: 0.3s;
+  border-radius: 5px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.CardContent {
+  font-size: 16px;
+  color: #333;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.Button {
+  margin: 10px;
+}
+
+.TextField {
+  margin: 10px;
+}
+
+.customAppBar {
+  background-color: #B3435A;
+  margin-bottom: 20px;
+}
+
+.tabsContainer {
+  background-color: #263E5A;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.verticalForm {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: left; 
 }
 
-.App-link {
-  color: #61dafb;
+.textField {
+  margin-bottom: 20px; /* Abstand zwischen den Textfeldern */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.background {
+  background-color: #D8C4B7;
+  border-radius: 10px;
+}
+
+.trainings {
+  background-color: #5393C0;
+  text-align: left;
 }
