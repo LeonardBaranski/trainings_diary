@@ -1,5 +1,6 @@
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+from bson import ObjectId
 
 
 class Database(object):
@@ -26,3 +27,6 @@ class Database(object):
 
     def add_running_data(self, running_data):
         return self.db.running_data.insert_one(running_data).inserted_id
+    
+    def delete_running_data(self, id):
+        return self.db.running_data.delete_one({"_id": ObjectId(id)})

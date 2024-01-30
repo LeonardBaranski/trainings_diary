@@ -5,6 +5,8 @@ from google.auth.transport import requests
 import models
 from bson import json_util
 import json
+import datetime
+import pytz
 
 
 password = "mCSQ34bbZ6hB0tH7"
@@ -75,8 +77,19 @@ def upload_data():
     user_id = user_info['sub']
     training_data = request.json
     training_data['user_id'] = user_id
+    training_data['date'] = datetime.datetime.now(pytz.timezone('Europe/Berlin')).strftime("%h %d %Y %H:%M:%S")
 
     db.add_running_data(training_data)
+
+    return jsonify({"success": True})
+
+@app.route('/mydata/<id>', methods=['DELETE'])
+def delete_data(id):
+    user_info = session.get('user')
+    if not user_info:
+        return jsonify({"error": "User not logged in"}), 403
+
+    db.delete_running_data(id)
 
     return jsonify({"success": True})
 
