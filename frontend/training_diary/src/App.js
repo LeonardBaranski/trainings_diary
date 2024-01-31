@@ -6,6 +6,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'r
 import GoogleLogin from './login'; // Path to GoogleLogin component
 import axios from 'axios';
 
+const BASE_URL = process.env.REACT_APP_BASE_URL;
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -117,7 +119,7 @@ const App = () => {
 
   useEffect(() => {
     if (tab === 1 && isLoggedIn) {
-      axios.get('http://localhost:5000/mydata', { withCredentials: true })
+      axios.get(BASE_URL + '/mydata', { withCredentials: true })
         .then(response => setData(response.data))
         .catch(error => console.error('Error fetching data', error));
     }
@@ -138,13 +140,13 @@ const App = () => {
         setDistance('');
         setSpeed('');
         setHeartRate('');
-        setSnackbarMessage('Data uploaded successfully');
+        setSnackbarMessage('Daten erfolgreich hochgeladen');
         setSnackbarOpen(true);
       })
       .catch(error => {
-        setSnackbarMessage('Error uploading data');
+        setSnackbarMessage('Fehler beim Hochladen der Daten');
         setSnackbarOpen(true);
-        console.error('Error uploading data', error);
+        console.error('Fehler beim Hochladen der Daten', error);
       });
   };
 
@@ -194,7 +196,7 @@ const App = () => {
           <Grid container justifyContent="center" style={{ marginTop: '20px' }}>
             <Grid item xs={12} md={6}>
               <Box p={3} textAlign="center" boxShadow={3} bgcolor="#fdd835" color="#000000" borderRadius={"10px"}>
-                <Typography variant="h3" gutterBottom>
+                <Typography variant="h3" gutterBottom fontFamily={"Oswald"}>
                   Online Trainingstagebuch
                 </Typography>
               </Box>
@@ -206,8 +208,6 @@ const App = () => {
                   Das Online Trainingstagebuch ist eine benutzerfreundliche Webanwendung, die es Ihnen ermöglicht, Ihre
                   Trainingsdaten einfach zu erfassen und detailliert auszuwerten.
                 </Typography>
-              </Box>
-              <Box mt={3} p={3} boxShadow={3} bgcolor="#ffffff" color="#000000" borderRadius={"10px"}>
                 <Typography variant="h5" gutterBottom>
                   Wie funktioniert es?
                 </Typography>
@@ -240,9 +240,15 @@ const App = () => {
             {isLoggedIn && <Button color="inherit" onClick={handleLogout}>Logout</Button>}
           </Toolbar>
         </AppBar>
+        
 
         <Grid container justifyContent="center" style={{ marginTop: '20px' }}>
           <Grid item xs={12} md={6}>
+          <Box p={3} textAlign="center" boxShadow={3} bgcolor="#fdd835" color="#000000" borderRadius={"10px"}>
+                <Typography variant="h3" gutterBottom fontFamily={"Oswald"}>
+                  Online Trainingstagebuch
+                </Typography>
+              </Box>
             <Tabs value={tab} onChange={(event, newValue) => setTab(newValue)} centered>
               <Tab label="Daten hochladen" />
               <Tab label="Deine Trainings" />
