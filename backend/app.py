@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, session, jsonify, render_template, url_for, request
+from flask import Flask, session, jsonify, request
 from flask_cors import CORS
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -7,25 +7,23 @@ from bson import json_util
 import json
 import datetime
 import pytz
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+APP_SECRET_KEY = os.getenv("APP_SECRET_KEY")
+MONGO_START = os.getenv("MONGO_START")
+MONGO_PASS = os.getenv("MONGO_PASS")
+MONGO_END = os.getenv("MONGO_END")
+MONGO_URI = MONGO_START + MONGO_PASS + MONGO_END + "=true&w=majority"
 
-password = "mCSQ34bbZ6hB0tH7"
-
-app = Flask(__name__, static_folder="../frontend/trainings_diary/build/static")
+app = Flask(__name__)
 CORS(app, supports_credentials=True)
-app.secret_key = 'my_secret_key'
-app.config["MONGO_URI"] =  f"mongodb+srv://leonardbaranski:{password}@running-data.z2dj6fb.mongodb.net/?retryWrites=true&w=majority"
+app.secret_key = APP_SECRET_KEY
+app.config["MONGO_URI"] = MONGO_URI
 
 db = models.Database(app)
-
-GOOGLE_CLIENT_ID = '42379345688-pct8948ievr9pl261l58ml0o8cga8cut.apps.googleusercontent.com'
-GOOGLE_CLIENT_SECRET = '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'
-REDIRECT_URI = 'http://localhost:5000/callback'
-
-## !!!!! HIER WEITERMACHE. LOGOUT GEHT; FINDET ABER TEMPLATE ZUR STARTSEITE NICHT
-@app.route("/", methods=['GET'])
-def home():
-    return render_template("index.html")
 
 @app.route('/callback', methods=['POST'])
 def callback():

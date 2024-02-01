@@ -5,6 +5,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import GoogleLogin from './login'; // Path to GoogleLogin component
 import axios from 'axios';
+import Footer from './footer.js'; // Path to Footer component
 
 const BASE_URL = process.env.REACT_APP_BASE_URL;
 
@@ -119,14 +120,14 @@ const App = () => {
 
   useEffect(() => {
     if (tab === 1 && isLoggedIn) {
-      axios.get(BASE_URL + '/mydata', { withCredentials: true })
+      axios.get(`${BASE_URL}/mydata`, { withCredentials: true })
         .then(response => setData(response.data))
         .catch(error => console.error('Error fetching data', error));
     }
   }, [tab, isLoggedIn]);
 
   const fetchData = () => {
-    axios.get('http://localhost:5000/mydata', { withCredentials: true })
+    axios.get(`${BASE_URL}/mydata`, { withCredentials: true })
       .then(response => {
         setData(response.data); // Aktualisieren Sie die Daten im State
       })
@@ -135,7 +136,7 @@ const App = () => {
 
   const handleSubmit = event => {
     event.preventDefault();
-    axios.post('http://localhost:5000/mydata', { distance, speed, heartRate }, { withCredentials: true })
+    axios.post(`${BASE_URL}/mydata`, { distance, speed, heartRate }, { withCredentials: true })
       .then(() => {
         setDistance('');
         setSpeed('');
@@ -151,7 +152,7 @@ const App = () => {
   };
 
   const handleDelete = (id) => {
-    axios.delete(`http://localhost:5000/mydata/${id}`, { withCredentials: true })
+    axios.delete(`${BASE_URL}/mydata/${id}`, { withCredentials: true })
       .then(() => {
         fetchData();
         setSnackbarMessage('Datensatz wurde erfolgreich gelöscht');
@@ -170,7 +171,7 @@ const App = () => {
   };
 
   const handleLogout = () => {
-    axios.post('http://localhost:5000/logout', {}, { withCredentials: true })
+    axios.post(`${BASE_URL}/logout`, {}, { withCredentials: true })
       .then(response => {
         if (response.data.message === 'Successfully logged out') {
           setIsLoggedIn(false);
@@ -220,7 +221,9 @@ const App = () => {
             </Grid>
           </Grid>
         </div>
+        <Footer />
       </ThemeProvider>
+      
     );
   }
 
@@ -314,6 +317,7 @@ const App = () => {
           message={snackbarMessage}
         />
       </div>
+      <Footer />
     </ThemeProvider>
   );
 };

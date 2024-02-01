@@ -1,0 +1,27 @@
+footer {
+    background-color: #fdd835; /* Gelb, anstatt Dunkelblau für bessere Sichtbarkeit */
+    color: #ffffff; /* Weißer Text */
+    text-align: center;
+    padding: 10px 0;
+    position: fixed; /* Fixiert den Footer am unteren Rand des Viewports */
+    left: 0; /* Streckt sich von der linken Seite */
+    bottom: 0; /* Positioniert am unteren Rand */
+    height: 50px; /* Höhe des Footers */
+    width: 100%; /* Streckt sich über die volle Breite */
+    box-sizing: border-box; /* Stellt sicher, dass Padding und Border innerhalb der angegebenen Breite und Höhe enthalten sind */
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  
+  
+  footer p {
+    margin: 10px 0; /* Vertikaler Abstand */
+  }
+  
+  footer a {
+    color: #333; /* Dunkler für bessere Lesbarkeit auf gelbem Hintergrund */
+    text-decoration: none;
+  }
+  
+  footer a:hover {
+    text-decoration: underline;
+  }
