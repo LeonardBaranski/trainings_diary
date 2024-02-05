@@ -2,7 +2,7 @@ from flask import Flask, session, jsonify, request
 from flask_cors import CORS
 from google.oauth2 import id_token
 from google.auth.transport import requests
-import models
+from backend import models
 from bson import json_util
 import json
 import datetime
@@ -90,7 +90,3 @@ def delete_data(id):
     db.delete_running_data(id)
 
     return jsonify({"success": True})
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
